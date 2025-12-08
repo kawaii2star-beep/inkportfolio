@@ -27,7 +27,19 @@ async function getNetWorthUsdForWallet(wallet: string): Promise<number> {
   }
 }
 
-export async function POST() {
+export async function POST(req: Request) {
+  // 1. SECRET CHECK
+  const auth = req.headers.get("x-cron-secret");
+  if (auth !== process.env.CRON_SECRET) {
+    return NextResponse.json(
+      { error: "unauthorized" },
+      { status: 401 }
+    );
+  }
+
+  // -----------------------
+  // 2. YOUR ORIGINAL CODE
+  // -----------------------
   try {
     const { data: rows, error } = await supabaseAdmin
       .from('tracked_wallets')
