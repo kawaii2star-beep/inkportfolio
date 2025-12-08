@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 
 const APP_URL =
-  process.env.APP_BASE_URL || 'http://localhost:3000'
+  process.env.APP_BASE_URL || 'https://inkportfolio-tau.vercel.app'
 
 async function getNetWorthUsdForWallet(wallet: string): Promise<number> {
   try {
