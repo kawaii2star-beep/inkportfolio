@@ -14,6 +14,7 @@ body {
   height: 100%;
 }
 
+
 body {
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif;
   background: #f3f4f6;
@@ -1168,7 +1169,10 @@ body[data-theme="dark"] .portfolio-value {
   justify-content: center;
   cursor: pointer;
   color: #6b7280;
-  transition: 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
 }
 
 /* hide pin button when collapsed */
@@ -1487,7 +1491,7 @@ body[data-theme="dark"] .sidebar-item-active .sidebar-icon {
 
 /* active vertical bar */
 body[data-theme="dark"] .sidebar-item-active::before {
-  background: #4f8aff;
+  background: linear-gradient(#a47bff, #6c46ff);
 }
 
 /* dividers */
@@ -1672,7 +1676,7 @@ body[data-theme="dark"] .sidebar-item-active .sidebar-icon {
 }
 
 body[data-theme="dark"] .sidebar-item-active::before {
-  background: #4f8aff;
+  background: linear-gradient(#a47bff, #6c46ff);
 }
 
 body[data-theme="dark"] .sidebar-section,
@@ -1908,6 +1912,12 @@ body[data-theme="dark"] .refresh-round-btn:hover {
   pointer-events: none;
 }
 
+/* REMOVE GREEN BACKGROUND */
+.portfolio-chart-bg {
+  display: none;
+}
+
+
 [data-theme="dark"] .portfolio-chart-bg {
   background: linear-gradient(
     to bottom,
@@ -1993,20 +2003,11 @@ body[data-theme="dark"] .refresh-round-btn:hover {
   stroke: #020617;
 }
 
-/* faint glow behind chart */
+/* REMOVE GREEN GLOW */
 .portfolio-chart::before {
-  content: '';
-  position: absolute;
-  inset: -6px -6px -10px -6px;
-  border-radius: 18px;
-  background: linear-gradient(
-    to bottom,
-    rgba(34, 197, 94, 0.10),
-    rgba(34, 197, 94, 0)
-  );
-  pointer-events: none;
-  opacity: 0.9;
+  display:none;
 }
+
 
 /* stronger cyan glow in dark */
 [data-theme='dark'] .portfolio-chart::before {
@@ -2738,22 +2739,27 @@ body[data-theme="dark"] {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 3px 6px;
-  border-radius: 10px;
-  font-size: 8px;
+
+  padding: 5px 10px;         /* bigger pill */
+  border-radius: 12px;
+
+  font-size: 11px;           /* bigger text */
   font-weight: 600;
+
   background: linear-gradient(135deg, #884beb, #b473f0);
   color: #ffffff;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14);
-  transform: translateY(1px); /* aligns better with text row */
+
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18);
+  transform: translateY(1px);
 }
+
 
 [data-theme="dark"] .gm-badge {
   box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.32);
 }
 
 .gm-badge-icon {
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .gm-badge-text {
@@ -4578,10 +4584,11 @@ body[data-theme='light'] .connect-wallet-btn {
 button {
   transition: transform .15s ease, box-shadow .15s ease;
 }
+
 button:hover {
-  transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(118, 87, 255, 0.2);
 }
+
 
 .card {
   animation: fadeIn .3s ease forwards;
@@ -4815,5 +4822,44 @@ body[data-theme="dark"] .qr-image {
   text-align: left;
   display: flex;
   font-variant-numeric: tabular-nums;
+}
+
+
+
+.ink-built-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  /* removed background + radius */
+  background: none;
+  padding: 0;
+
+  font-size: 14px;
+  font-weight: 700;
+  color: #6c46ff; /* ink purple */
+}
+
+.ink-built-logo {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.ink-built-text {
+  text-transform: lowercase;
+}
+
+body[data-theme="dark"] .theme-toggle-btn {
+  background: #1f2937 !important;         /* visible dark grey */
+  border: 1px solid #4c4cff !important;   /* purple highlight, subtle */
+  color: #ffffff !important;              /* bright icon */
+  box-shadow: 0 0 4px rgba(120, 90, 255, 0.4);
+}
+
+body[data-theme="dark"] .theme-toggle-btn:hover {
+  background: #273349 !important;
+  border-color: #7d6bff !important;
+  box-shadow: 0 0 8px rgba(130, 100, 255, 0.55);
 }
 

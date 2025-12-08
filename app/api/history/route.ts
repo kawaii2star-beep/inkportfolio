@@ -6,37 +6,39 @@ import { supabaseAdmin } from '@/lib/supabase'
 const ONE_HOUR_MS = 60 * 60 * 1000
 const ONE_DAY_MS = 24 * ONE_HOUR_MS
 
-type RangeKey = '1w' | '1m' | '1y'
+type RangeKey = '24h' | '1w' | '1m'
 
 function getRangeConfig(rangeParam: string | null) {
   let key: RangeKey = '1w'
-  if (rangeParam === '1m' || rangeParam === '1y') {
+
+  if (rangeParam === '24h' || rangeParam === '1w' || rangeParam === '1m') {
     key = rangeParam
+  }
+
+  if (key === '24h') {
+    return {
+      key,
+      totalHours: 24,         // last 24 hours
+      bucketMs: ONE_HOUR_MS,  // 1 hour candles
+    }
   }
 
   if (key === '1w') {
     return {
       key,
-      totalHours: 24 * 7,      // show last 7 days
-      bucketMs: ONE_HOUR_MS,   // 1 hour candles
+      totalHours: 24 * 7,     // last 7 days
+      bucketMs: ONE_HOUR_MS,  // 1 hour candles
     }
   }
 
-  if (key === '1m') {
-    return {
-      key,
-      totalHours: 24 * 30,     // last 30 days
-      bucketMs: ONE_DAY_MS,    // 1 day candles
-    }
-  }
-
-  // 1y
+  // 1m
   return {
-    key: '1y',
-    totalHours: 24 * 365,      // last 365 days
-    bucketMs: ONE_DAY_MS,      // 1 day candles
+    key: '1m',
+    totalHours: 24 * 30,      // last 30 days
+    bucketMs: ONE_DAY_MS,     // 1 day candles
   }
 }
+
 
 export async function GET(req: Request) {
   const url = new URL(req.url)

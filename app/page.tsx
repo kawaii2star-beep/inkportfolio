@@ -249,7 +249,7 @@ type TokenHolding = {
 
 
 
-type HistoryRange = "1W" | "1M" | "1Y";
+type HistoryRange = "24H" | "1W" | "1M";
 
 type PositionsTab = "wallet" | "yielding" | "nfts" | "transactions";
 
@@ -726,7 +726,8 @@ if (data?.tokens?.length) {
   const loadHistory = async (addr: string, range: HistoryRange) => {
     if (!addr) return;
 
-    const rangeParam = range === "1W" ? "1w" : range === "1M" ? "1m" : "1y";
+const rangeParam =
+  range === "24H" ? "24h" : range === "1W" ? "1w" : "1m";
 
     try {
       const res = await fetch(
@@ -1721,7 +1722,17 @@ return (
     
         className={`header ${isPinned ? "header-pinned" : "header-floating"}`}
       >
-        <div className="header-left">{pageTitles[activePage]}</div>
+<div className='header-left'>
+  <div className='ink-built-pill'>
+    <img
+      src='/ink-logo-purple-white-icon.svg'
+      alt='ink'
+      className='ink-built-logo'
+    />
+    <span className='ink-built-text'>built on ink</span>
+  </div>
+</div>
+
 
         <div className="header-center">
           <div className="search-wrapper">
@@ -2260,38 +2271,40 @@ onKeyDown={async (e) => {
                       <span className="portfolio-title-pill">ink only</span>
                     </div>
 
-                    <div className="portfolio-range-switch">
-                      <button
-                        className={
-                          historyRange === "1W"
-                            ? "range-btn range-btn-active"
-                            : "range-btn"
-                        }
-                        onClick={() => changeHistoryRange("1W")}
-                      >
-                        1W
-                      </button>
-                      <button
-                        className={
-                          historyRange === "1M"
-                            ? "range-btn range-btn-active"
-                            : "range-btn"
-                        }
-                        onClick={() => changeHistoryRange("1M")}
-                      >
-                        1M
-                      </button>
-                      <button
-                        className={
-                          historyRange === "1Y"
-                            ? "range-btn range-btn-active"
-                            : "range-btn"
-                        }
-                        onClick={() => changeHistoryRange("1Y")}
-                      >
-                        1Y
-                      </button>
-                    </div>
+<div className="portfolio-range-switch">
+  <button
+    className={
+      historyRange === "24H"
+        ? "range-btn range-btn-active"
+        : "range-btn"
+    }
+    onClick={() => changeHistoryRange("24H")}
+  >
+    24H
+  </button>
+
+  <button
+    className={
+      historyRange === "1W"
+        ? "range-btn range-btn-active"
+        : "range-btn"
+    }
+    onClick={() => changeHistoryRange("1W")}
+  >
+    1W
+  </button>
+
+  <button
+    className={
+      historyRange === "1M"
+        ? "range-btn range-btn-active"
+        : "range-btn"
+    }
+    onClick={() => changeHistoryRange("1M")}
+  >
+    1M
+  </button>
+</div>
                   </div>
 
   <div className="portfolio-tag-row">
