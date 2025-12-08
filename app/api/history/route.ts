@@ -56,8 +56,14 @@ export async function GET(req: Request) {
 
   try {
     const now = Date.now()
-    const fromMs = now - totalHours * ONE_HOUR_MS
+
+    // snap to bucket boundary so chart x positions do not move on every refresh
+    const totalSpanMs = totalHours * ONE_HOUR_MS
+    const bucketAlignedNow = Math.floor(now / bucketMs) * bucketMs
+
+    const fromMs = bucketAlignedNow - totalSpanMs
     const fromIso = new Date(fromMs).toISOString()
+
 
     const { data, error } = await supabaseAdmin
       .from('wallet_networth_snapshots')
@@ -84,7 +90,8 @@ export async function GET(req: Request) {
 
     if (rows.length === 0) {
       // no data yet  flat line
-      for (let t = fromMs; t <= now; t += bucketMs) {
+      for (let t = fromMs; t <= bucketAlignedNow; t += bucketMs) {
+
         points.push({
           timestamp: new Date(t).toISOString(),
           value_usd: 0,
@@ -93,13 +100,23 @@ export async function GET(req: Request) {
       return NextResponse.json(points)
     }
 
-    let rowIndex = 0
+    const perBucket: Record<number, number> = {}
+
+    // group snapshots by hour bucket, last snapshot in that hour wins
+    for (const row of rows) {
+      const bucketIndex = Math.floor(row.t / bucketMs)
+      perBucket[bucketIndex] = row.v
+    }
+
     let lastValue = rows[0].v
 
-    for (let t = fromMs; t <= now; t += bucketMs) {
-      while (rowIndex < rows.length && rows[rowIndex].t <= t) {
-        lastValue = rows[rowIndex].v
-        rowIndex += 1
+    // build points: time is exact bucket start (HH:00) but value is latest in that hour
+    for (let t = fromMs; t <= bucketAlignedNow; t += bucketMs) {
+      const bucketIndex = Math.floor(t / bucketMs)
+      const v = perBucket[bucketIndex]
+
+      if (typeof v === 'number') {
+        lastValue = v
       }
 
       points.push({
@@ -107,6 +124,7 @@ export async function GET(req: Request) {
         value_usd: lastValue,
       })
     }
+
 
     // remove leading zeros so chart starts at first real value
     const firstNonZeroIndex = points.findIndex((p) => p.value_usd > 0)

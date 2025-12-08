@@ -2125,21 +2125,20 @@ onKeyDown={async (e) => {
       ? "your wallet: "
       : "watching: "
     : "no wallet selected"}
-  {walletAddress && (
-    <>
-      {ensName
-        ? `${ensName} (${formatAddress(walletAddress)})`
-        : formatAddress(walletAddress)}
-      <a
-        href={`https://explorer.inkonchain.com/address/${walletAddress}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="wallet-explorer-link"
-      >
-        🔗
-      </a>
-    </>
-  )}
+{walletAddress && (
+  <>
+    {ensName || formatAddress(walletAddress)}
+    <a
+      href={`https://explorer.inkonchain.com/address/${walletAddress}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="wallet-explorer-link"
+    >
+      🔗
+    </a>
+  </>
+)}
+
 </span>
 
 
@@ -2340,52 +2339,70 @@ onKeyDown={async (e) => {
 
       <div className="portfolio-chart">
 
-                        <svg
-                          viewBox="0 0 100 50"
-                          preserveAspectRatio="none"
-                          className="chart-svg"
-                          onMouseLeave={() => setHoverIndex(null)}
-                          onMouseMove={(e) => {
-                            if (netWorthHistory.length < 2) return;
-                            const rect =
-                              (e.currentTarget as SVGSVGElement).getBoundingClientRect();
-                            const x = e.clientX - rect.left;
-                            const step =
-                              rect.width / (netWorthHistory.length - 1);
-                            const index = Math.round(x / step);
-                            const clamped = Math.max(
-                              0,
-                              Math.min(netWorthHistory.length - 1, index)
-                            );
-                            setHoverIndex(clamped);
-                          }}
-                        >
-          <polygon
-            className="portfolio-chart-fill"
-            points={fillPoints}
-          />
-          <polyline
-            className="portfolio-chart-line"
-            points={linePoints}
-          />
-          {hoverX != null && hoverY != null && (
-            <>
-              <line
-                className="chart-hover-line"
-                x1={hoverX}
-                x2={hoverX}
-                y1={0}
-                y2={50}
-              />
-              <circle
-                className="chart-hover-dot"
-                cx={hoverX}
-                cy={hoverY}
-                r={1.2}
-              />
-            </>
-          )}
-        </svg>
+<svg
+  viewBox="0 0 100 50"
+  preserveAspectRatio="none"
+  className="chart-svg"
+  onMouseLeave={() => setHoverIndex(null)}
+  onMouseMove={(e) => {
+    if (netWorthHistory.length < 2) return;
+    const rect =
+      (e.currentTarget as SVGSVGElement).getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const step =
+      rect.width / (netWorthHistory.length - 1);
+    const index = Math.round(x / step);
+    const clamped = Math.max(
+      0,
+      Math.min(netWorthHistory.length - 1, index)
+    );
+    setHoverIndex(clamped);
+  }}
+>
+  <defs>
+    <linearGradient
+      id="networthAreaGradient"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop offset="0" stopColor="currentColor" stopOpacity="0.26" />
+      <stop offset="0.45" stopColor="currentColor" stopOpacity="0.12" />
+      <stop offset="1" stopColor="currentColor" stopOpacity="0" />
+    </linearGradient>
+  </defs>
+
+  <polygon
+    className="portfolio-chart-fill"
+    points={fillPoints}
+    fill="url(#networthAreaGradient)"
+  />
+
+  <polyline
+    className="portfolio-chart-line"
+    points={linePoints}
+  />
+
+  {hoverX != null && hoverY != null && (
+    <>
+      <line
+        className="chart-hover-line"
+        x1={hoverX}
+        x2={hoverX}
+        y1={0}
+        y2={50}
+      />
+      <circle
+        className="chart-hover-dot"
+        cx={hoverX}
+        cy={hoverY}
+        r={1.4}
+      />
+    </>
+  )}
+</svg>
+
 
                       </div>
                     </div>
