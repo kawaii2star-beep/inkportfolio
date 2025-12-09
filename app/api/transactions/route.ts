@@ -7,6 +7,8 @@ const KNOWN_APPS: Record<string, string> = {
   // inkyPump
   '0x1d74317d760f2c72a94386f50e8d10f2c902b899': 'InkyPump',
 
+  // inkyswap
+  '0xa8c1c38ff57428e5c3a34e0899be5cb385476507': 'InkySwap',
   // across ink spoke pool
   '0xef684c38f94f48775959ecf2012d7e864ffb9dd4': 'Across V2',
 

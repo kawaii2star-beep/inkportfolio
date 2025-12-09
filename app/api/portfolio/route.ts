@@ -780,7 +780,7 @@ if (nadoUsd && Number.isFinite(nadoUsd) && nadoUsd > 0) {
     tokenAddress: 'nado-margin',
     symbol: 'USDT', // Nado margin is USD-denominated
     protocol: 'Nado',
-    poolName: 'Nado margin account',
+    poolName: 'Nado account',
     amount: nadoUsd,       // treat amount = equity in USD terms
     depositedUsd: nadoUsd, // 1:1 with USD value
     rewardsUsd: 0,

@@ -1283,18 +1283,10 @@ body[data-theme="dark"] .portfolio-value {
 }
 
 
-/* copyright text: keep space, just fade it */
+/* copyright text always visible */
 .sidebar-footer-copy-text {
-  opacity: 0;
-  transition: opacity 0.15s ease;
-  white-space: nowrap;   /* ← keep it on one line */
-}
-
-
-/* when sidebar is hovered open or pinned, show the text */
-.sidebar-floating:hover .sidebar-footer-copy-text,
-.sidebar-pinned .sidebar-footer-copy-text {
   opacity: 1;
+  white-space: nowrap;
 }
 
 
@@ -1310,9 +1302,6 @@ body[data-theme="dark"] .portfolio-value {
   color: #9ca3af;
 }
 
-.sidebar-bottom-icon:hover {
-  color: #4b5563;
-}
 
 .sidebar-bottom-icon svg {
   width: 18px;
@@ -1341,10 +1330,27 @@ body[data-theme="dark"] .portfolio-value {
   stroke-width: 1.6;
 }
 
-.sidebar-bottom-icon:hover {
+.sidebar-footer-twitter:hover .sidebar-bottom-icon,
+.sidebar-footer-feedback:hover .sidebar-bottom-icon,
+.sidebar-footer-contact:hover .sidebar-bottom-icon {
   color: #0f172a;
   transform: scale(1.1);
 }
+
+/* make text turn dark when hovering the whole row */
+.sidebar-footer-feedback:hover span:last-child,
+.sidebar-footer-contact:hover span:last-child,
+.sidebar-footer-twitter:hover span:last-child {
+  color: #0f172a;
+}
+
+body[data-theme='dark'] .sidebar-footer-feedback:hover {
+  color: #e5e7eb;
+}
+body[data-theme='dark'] .sidebar-footer-contact:hover {
+  color: #e5e7eb;
+}
+
 
 /* secondary rows use same size as main, just lighter text by default */
 .sidebar-item-secondary .sidebar-label {
@@ -1356,15 +1362,10 @@ body[data-theme="dark"] .portfolio-value {
   color: #111827;
 }
 
-.sidebar-twitter-alone {
-  padding: 10px 18px 6px 18px; /* similar to footer spacing */
+.sidebar-twitter-row {
+  padding: 10px 18px 6px 18px;
 }
 
-.sidebar-twitter-alone {
-  border-top: 1px solid #e5e7eb;
-  margin-top: 175px;
-  padding: 14px 18px 8px 18px; 
-}
 
 .sidebar-twitter-label {
   font-size: 13px;
@@ -1383,7 +1384,44 @@ body[data-theme="dark"] .portfolio-value {
   cursor: pointer;
 }
 
-/* you already have the glow styles for .asset-pill and dark mode */
+
+.sidebar-footer {
+  border-top: 1px solid #e5e7eb;
+  padding: 10px 18px 14px 18px;
+}
+
+/* default copyright text */
+.sidebar-footer-copy {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.sidebar-footer-copy-symbol {
+  font-size: 11px;
+}
+
+.sidebar-footer-copy-text {
+  white-space: nowrap;
+}
+
+
+/* behavior by sidebar state */
+
+/* pinned or hovered open: links and text show, icons hidden */
+.sidebar-pinned .sidebar-footer-links-row,
+.sidebar-floating:hover .sidebar-footer-links-row {
+  display: flex;
+}
+
+.sidebar-pinned .sidebar-footer-copy,
+.sidebar-floating:hover .sidebar-footer-copy {
+  display: flex;
+}
+
+
 
 /* show label when sidebar open */
 .sidebar-floating:hover .sidebar-twitter-label,
@@ -1681,11 +1719,119 @@ body[data-theme="dark"] .sidebar-item-active::before {
 
 body[data-theme="dark"] .sidebar-section,
 body[data-theme="dark"] .sidebar-footer {
-  border-top-color: #1e2533;
+  border-top-color: #4a4f5c; /* subtle but visible */
 }
 
 body[data-theme="dark"] .sidebar-app-name {
   color: #e2e8f0;
+}
+
+
+.sidebar-footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.sidebar-footer-link {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 13px;
+  color: #9ca3af;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sidebar-footer-link:hover {
+  color: #111827;
+}
+
+.sidebar-twitter-row {
+  padding: 10px 18px 6px 18px;
+}
+
+.sidebar-footer-links-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.sidebar-footer-link {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 12px;
+  color: inherit;
+  cursor: pointer;
+}
+
+.sidebar-footer-link:hover {
+  color: #4b5563;
+}
+
+.sidebar-footer-dot {
+  font-size: 11px;
+  color: #d1d5db;
+}
+
+.sidebar-social-row {
+  padding: 10px 18px 6px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-top: 1px;
+margin-bottom: 2px; /* optional, spacing above footer */
+
+}
+
+.sidebar-footer-feedback {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  font-size: 13px;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px 0;
+  transition: 0.15s;
+}
+
+.sidebar-footer-feedback:hover {
+  color: #111827;
+}
+
+body[data-theme='dark'] .sidebar-footer-feedback:hover {
+  color: #e5e7eb;
+}
+
+/* footer links behavior */
+
+/* default: visible when pinned */
+.sidebar-pinned .sidebar-footer-links-row {
+  display: flex;
+}
+
+/* when user hovers the floating sidebar open, show links */
+.sidebar-floating:hover .sidebar-footer-links-row {
+  display: flex;
+}
+
+/* optional: center copyright when collapsed */
+.sidebar-floating .sidebar-footer {
+  padding-left: 0;
+  padding-right: 0;
+  text-align: center;
+}
+
+.sidebar-floating .sidebar-footer-copy {
+  justify-content: center;
 }
 
 /* ===========================
@@ -5001,4 +5147,680 @@ body[data-theme="dark"] .theme-toggle-btn:hover {
   color: #e5e7eb;
   box-shadow:
     0 0 0 1px rgba(15, 23, 42, 0.7);
+}
+
+/* footer container */
+.sidebar-footer {
+  border-top: 1px solid #e5e7eb;
+  padding: 10px 18px 14px 18px;
+}
+
+/* links row (About us / Terms) */
+.sidebar-footer-links-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.sidebar-footer-link {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 12px;
+  color: inherit;
+  cursor: pointer;
+}
+
+.sidebar-footer-link:hover {
+  color: #4b5563;
+}
+
+.sidebar-footer-dot {
+  font-size: 11px;
+  color: #d1d5db;
+}
+
+/* when sidebar is open → © and "2025 Ink Dashboard" should be in one row */
+.sidebar-footer-copy {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+
+/* three dots button – default hidden, only for collapsed */
+.sidebar-footer-dots {
+  display: flex;
+  width: 28px;
+  height: 18px;
+  border: none;
+  background: transparent;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.sidebar-footer-dots span {
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: #9ca3af;
+}
+
+/* © base style (open sidebar) */
+.sidebar-footer-copy-symbol {
+  font-size: 12px;
+  color: #9ca3af;
+  transition: all 0.2s ease;
+}
+
+.sidebar-footer-copy-text {
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+
+/* ===== behavior by sidebar state ===== */
+
+/* OPEN (pinned or hovered): show links + text, hide dots, small © */
+
+.sidebar-pinned .sidebar-footer-links-row,
+.sidebar-floating:hover .sidebar-footer-links-row {
+  display: flex;
+}
+
+.sidebar-pinned .sidebar-footer-copy-text,
+.sidebar-floating:hover .sidebar-footer-copy-text {
+  opacity: 1;
+  display: inline;
+}
+
+.sidebar-pinned .sidebar-footer-dots,
+.sidebar-floating:hover .sidebar-footer-dots {
+  display: none;
+}
+
+/* COLLAPSED RESTING: hide links & year, show dots + big © circle */
+
+.sidebar-floating .sidebar-footer-copy {
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar-floating .sidebar-footer-dots {
+  display: flex;
+}
+
+.sidebar-floating .sidebar-footer-copy-text {
+  opacity: 0;
+  display: none;
+}
+
+.sidebar-floating .sidebar-footer-copy-symbol {
+  font-size: 20px;
+  border: 1px solid #9ca3af;
+  border-radius: 999px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* collapsed state: only dots and big ©, no vertical jump */
+.sidebar-floating .sidebar-footer-links-row {
+  display: none;
+}
+
+.sidebar-floating .sidebar-footer-dots {
+  display: flex;
+  margin-bottom: 6px;
+}
+
+.sidebar-floating .sidebar-footer-copy {
+  justify-content: center;
+  align-items: center;
+}
+
+.sidebar-floating .sidebar-footer-copy-text {
+  display: none;
+}
+
+/* big ©, but same vertical alignment as open state */
+.sidebar-floating .sidebar-footer-copy-symbol {
+  font-size: 20px;
+  border: 1px solid #9ca3af;
+  border-radius: 999px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+
+/* when sidebar is OPEN (pinned or hover) keep © + text on one line */
+.sidebar-pinned .sidebar-footer-copy,
+.sidebar-floating:hover .sidebar-footer-copy {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+/* reset the big circle © back to normal when open */
+.sidebar-pinned .sidebar-footer-copy-symbol,
+.sidebar-floating:hover .sidebar-footer-copy-symbol {
+  font-size: 12px;
+  border: 0;
+  width: auto;
+  height: auto;
+}
+
+/* center the three dots in collapsed mode */
+.sidebar-floating .sidebar-footer-dots {
+  justify-content: center;
+  width: 100%;
+}
+
+/* ----------------------------- */
+/* OPEN SIDEBAR (pinned or hover) */
+/* ----------------------------- */
+.sidebar-pinned .sidebar-footer,
+.sidebar-floating:hover .sidebar-footer {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* center links row */
+.sidebar-pinned .sidebar-footer-links-row,
+.sidebar-floating:hover .sidebar-footer-links-row {
+  justify-content: center;
+}
+
+/* center © + text row */
+.sidebar-pinned .sidebar-footer-copy,
+.sidebar-floating:hover .sidebar-footer-copy {
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+
+/* normal © size in open mode */
+.sidebar-pinned .sidebar-footer-copy-symbol,
+.sidebar-floating:hover .sidebar-footer-copy-symbol {
+  font-size: 22px;
+  border: none;
+  width: auto;
+  height: auto;
+}
+.sidebar-floating .sidebar-footer-links-row {
+  display: none;
+}
+
+.sidebar-floating .sidebar-footer-copy {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.sidebar-floating .sidebar-footer-dots {
+  display: flex;
+}
+
+.sidebar-floating .sidebar-footer-copy-text {
+  display: none;
+}
+
+.sidebar-floating .sidebar-footer-copy-symbol {
+  font-size: 22px;
+  border-radius: 999px;
+  width: 26px;
+  height: 26px;
+  border: 0px solid #d1d5db;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-footer-contact {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  font-size: 13px;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px 0;
+  transition: 0.15s ease;
+}
+
+.sidebar-footer-contact:hover {
+  color: #111827;
+}
+
+.sidebar-divider {
+  width: 100%;
+  height: 1px;
+  background: #e5e7eb;
+  margin: 25px 0;
+}
+body[data-theme=dark] .sidebar-divider {
+  background: #4a4f5c;  /* same vibe as other dividers */
+}
+
+
+.feedback-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.feedback-modal {
+  width: 360px;
+  max-width: 90vw;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px 18px 18px;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.22);
+}
+
+body[data-theme='dark'] .feedback-modal {
+  background: #020617;
+}
+
+.feedback-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.feedback-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.feedback-close-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0;
+  color: #6b7280;
+}
+
+.feedback-close-btn:hover {
+  color: #111827;
+}
+
+.feedback-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.feedback-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.feedback-label {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.feedback-input,
+.feedback-select,
+.feedback-textarea {
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  padding: 8px 10px;
+  font-size: 13px;
+  background: #f9fafb;
+}
+
+.feedback-textarea {
+  resize: vertical;
+}
+
+body[data-theme='dark'] .feedback-input,
+body[data-theme='dark'] .feedback-select,
+body[data-theme='dark'] .feedback-textarea {
+  background: #020617;
+  border-color: #1e293b;
+  color: #e5e7eb;
+}
+/* feedback modal */
+
+.feedback-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 70;
+}
+
+.feedback-modal {
+  width: 380px;
+  max-width: 90vw;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow:
+    0 18px 45px rgba(15, 23, 42, 0.16),
+    0 0 0 1px rgba(148, 163, 184, 0.15);
+  padding: 20px 22px 18px;  /* more inner padding */
+  font-size: 13px;
+  color: #111827;
+}
+
+.feedback-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;      /* more space under title */
+}
+
+.feedback-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.feedback-close-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 2px 4px;
+  opacity: 0.6;
+}
+
+.feedback-close-btn:hover {
+  opacity: 1;
+}
+
+.feedback-type-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;                 /* more gap between chips */
+  margin-bottom: 16px;
+}
+
+.feedback-type-chip {
+  padding: 7px 16px;
+  border-radius: 12px;
+  border: 1px solid #d8dbe2;
+  background: #fafafa;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.14s ease;
+  color: #444;
+}
+
+.feedback-type-chip:hover {
+  background: #f0f0f5;
+  border-color: #c8cbd4;
+}
+
+.feedback-type-chip.active {
+  background: #ffffff;
+  border: 2px solid #8a42ff;
+  color: #8a42ff;
+  box-shadow:
+    0 0 0 0px rgba(138, 66, 255, 0.15);
+  font-weight: 600;
+}
+
+
+.feedback-field {
+  margin-bottom: 12px;      /* more vertical spacing between fields */
+}
+
+.feedback-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.feedback-textarea {
+  width: 100%;
+  min-height: 110px;
+  resize: vertical;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 9px 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.feedback-textarea::placeholder {
+  color: #9ca3af;
+}
+
+.feedback-textarea:focus {
+  border-color: #a855f7;
+  box-shadow: 0 0 0 1px rgba(168, 85, 247, 0.25);
+}
+
+.feedback-input {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  padding: 7px 10px;
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.feedback-input::placeholder {
+  color: #9ca3af;
+}
+
+.feedback-input:focus {
+  border-color: #a855f7;
+  box-shadow: 0 0 0 1px rgba(168, 85, 247, 0.2);
+}
+
+.feedback-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 10px;         /* space above Send row */
+  gap: 8px;
+}
+
+.feedback-status {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.feedback-status-ok {
+  color: #16a34a;
+}
+
+.feedback-status-error {
+  color: #dc2626;
+}
+
+.feedback-send-btn {
+  padding: 10px 22px;
+  background: linear-gradient(135deg, #7b2ff7, #9f57ff);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  opacity: 1;
+  transition: all 0.15s ease;
+  box-shadow:
+    0 3px 8px rgba(123, 47, 247, 0.25),
+    inset 0 0 0 1px rgba(255,255,255,0.12);
+}
+
+.feedback-send-btn:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 6px 14px rgba(123, 47, 247, 0.34),
+    inset 0 0 0 1px rgba(255,255,255,0.15);
+}
+
+.feedback-send-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+
+.feedback-submit-btn {
+  margin-top: 12px;   /* <-- add spacing */
+  border-radius: 999px;
+  border: 2px solid #a855f7;
+  background: linear-gradient(135deg, #a855f7, #6366f1);
+  color: #f9fafb;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+
+.feedback-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.feedback-send-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(79, 70, 229, 0.4);
+}
+
+
+.feedback-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 20px;
+  padding: 4px 4px 0 4px;
+}
+
+.feedback-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 4px;
+  transition: opacity 0.15s ease;
+}
+
+.feedback-close-btn:hover {
+  opacity: 0.6;
+}
+
+.feedback-error-text {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #ef4444;
+  opacity: 0.9;
+}
+
+/* DARK MODE override for footer hover */
+body[data-theme='dark'] .sidebar-footer-twitter:hover,
+body[data-theme='dark'] .sidebar-footer-feedback:hover,
+body[data-theme='dark'] .sidebar-footer-contact:hover {
+  color: #e5e7eb;
+}
+
+body[data-theme='dark'] .sidebar-footer-twitter:hover .sidebar-bottom-icon,
+body[data-theme='dark'] .sidebar-footer-feedback:hover .sidebar-bottom-icon,
+body[data-theme='dark'] .sidebar-footer-contact:hover .sidebar-bottom-icon {
+  color: #e5e7eb;
+}
+
+body[data-theme='dark'] .sidebar-footer-twitter:hover span:last-child,
+body[data-theme='dark'] .sidebar-footer-feedback:hover span:last-child,
+body[data-theme='dark'] .sidebar-footer-contact:hover span:last-child {
+  color: #e5e7eb;
+}
+
+body[data-theme='dark'] .sidebar {
+  border-right: 2px solid #2e3647; /* dark mode subtle border */
+}
+
+.sidebar {
+  box-shadow: 1px 0 0 0 #cbd5e1;
+}
+
+body[data-theme='dark'] .sidebar {
+  box-shadow: 1px 0 0 0 #2e3647;
+}
+
+/* HEADER PREMIUM SEPARATOR */
+.header {
+  border-bottom: 1px solid #cbd5e1; /* light mode */
+}
+
+body[data-theme='dark'] .header {
+  border-bottom: 2px solid #2e3647; /* dark mode */
+}
+/* HEADER PREMIUM SHADOW */
+.header {
+  box-shadow: 0 1px 0 0 #cbd5e1; /* light mode hairline */
+}
+
+body[data-theme='dark'] .header {
+  box-shadow: 0 2px 0 0 #2e3647; /* dark mode hairline */
+}
+
+.search-wrapper:hover {
+  border-color: rgba(99,102,241,0.35); /* soft lavender tint */
+}
+
+body[data-theme='dark'] .search-wrapper:hover {
+  border-color: rgba(129,140,248,0.45);
+}
+/* LIGHT MODE */
+.search-wrapper {
+  border: 1px solid rgba(0,0,0,0.10); /* subtle hairline */
+    border-radius: 11px;
+  background: transparent;            /* keep your original */
+  backdrop-filter: blur(2px);         /* premium subtle effect */
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* DARK MODE */
+body[data-theme='dark'] .search-wrapper {
+  border: 1px solid rgba(255,255,255,0.08);
+  background: transparent;
 }

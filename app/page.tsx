@@ -17,6 +17,8 @@ import {
 } from "@heroicons/react/24/outline";
 
 import PreloadPlatformIcons from "./PreloadPlatformIcons";
+import { ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
+import { EnvelopeIcon } from "@heroicons/react/24/outline";
 
 
 function getFavicon(url: string | null): string | null {
@@ -103,6 +105,7 @@ async function resolveInkDomain(name: string): Promise<string | null> {
 const PLATFORM_ICONS: Record<string, string> = {
   // inkypump
   '0x1d74317d760f2c72a94386f50e8d10f2c902b899': 'Inkyswap',
+  '0xa8c1c38ff57428e5c3a34e0899be5cb385476507': 'Inkyswap',
 
   // across
   '': '',
@@ -489,6 +492,20 @@ function parseTxDetails(details: string | undefined): TxLeg[] {
 }
 
 
+function isValidContactInfo(input: string): boolean {
+  const s = input.trim()
+  if (!s) return false
+
+  // twitter handle style: @name
+  if (s.startsWith('@') && s.length >= 3) return true
+
+  // simple email check: something@something.xxx
+  const emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
+  if (emailRe.test(s)) return true
+
+  return false
+}
+
 
 
 export default function HomePage() {
@@ -544,6 +561,16 @@ const [connectedEnsName, setConnectedEnsName] = useState<string | null>(null);
 const [walletCopied, setWalletCopied] = useState(false);
 const [txCopiedKey, setTxCopiedKey] = useState<string | null>(null);
   const [lastUpdatedAt, setLastUpdatedAt] = useState<number | null>(null);
+
+// feedback
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [feedbackCategory, setFeedbackCategory] = useState<'feature' | 'bug' | 'idea' | 'other' | 'contact'>('feature');
+  const [feedbackContact, setFeedbackContact] = useState('');
+  const [feedbackSending, setFeedbackSending] = useState(false);
+  const [feedbackStatus, setFeedbackStatus] = useState<'idle' | 'ok' | 'error'>('idle');
+  const isContactMode = feedbackCategory === 'contact';
+  const contactIsValid = !isContactMode || isValidContactInfo(feedbackContact);
 
   // icons from Dexscreener keyed by token address
   const [tokenIcons, setTokenIcons] = useState<{ [addr: string]: string }>({});
@@ -2014,25 +2041,83 @@ onKeyDown={async (e) => {
             </button>
           </section>
 
-          {/* X button */}
-          <div className="sidebar-twitter-alone">
-            <button className="sidebar-footer-twitter">
-              <span className="sidebar-bottom-icon">
-                <TwitterIconSvg />
-              </span>
-              <span className="sidebar-twitter-label">follow on X</span>
-            </button>
-          </div>
+<div className="sidebar-divider"></div>
+{/* X button row above footer line */}
+<div className="sidebar-social-row">
 
-          {/* footer */}
-          <div className="sidebar-footer">
-            <div className="sidebar-footer-copy">
-              <span className="sidebar-footer-copy-symbol">©</span>
-              <span className="sidebar-footer-copy-text">
-                2025 Ink Dashboard
-              </span>
-            </div>
-          </div>
+  <button
+    className="sidebar-footer-twitter"
+    onClick={() => window.open("https://x.com/YOUR_HANDLE", "_blank")}
+  >
+    <span className="sidebar-bottom-icon">
+      <TwitterIconSvg />
+    </span>
+    <span className="sidebar-twitter-label">follow us</span>
+  </button>
+
+  <button
+    className='sidebar-footer-feedback'
+onClick={() => {
+  setFeedbackCategory('feature');
+  setFeedbackMessage('');
+  setFeedbackContact('');
+  setFeedbackStatus('idle');
+  setIsFeedbackOpen(true);
+}}
+  >
+    <span className='sidebar-bottom-icon'>
+      <ChatBubbleLeftRightIcon width={16} height={16} />
+    </span>
+    <span className='sidebar-twitter-label'>feedback</span>
+  </button>
+
+  <button
+    className='sidebar-footer-contact'
+onClick={() => {
+  setFeedbackCategory('contact');
+  setFeedbackMessage('');
+  setFeedbackContact('');
+  setFeedbackStatus('idle');
+  setIsFeedbackOpen(true);
+}}
+  >
+    <span className='sidebar-bottom-icon'>
+      <EnvelopeIcon width={16} height={16} />
+    </span>
+    <span className='sidebar-twitter-label'>contact us</span>
+  </button>
+</div>
+
+
+
+{/* footer links + copyright */}
+<div className="sidebar-footer">
+
+  {/* text links (only when sidebar is open) */}
+  <div className="sidebar-footer-links-row">
+    <button className="sidebar-footer-link">About Us</button>
+    <span className="sidebar-footer-dot">•</span>
+    <button className="sidebar-footer-link">Terms of service</button>
+  </div>
+
+  {/* three dots (collapsed only) */}
+  <button
+    className="sidebar-footer-dots"
+    aria-label="More info"
+  >
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  {/* copyright row (open = normal, collapsed = big C) */}
+  <div className="sidebar-footer-copy">
+    <span className="sidebar-footer-copy-symbol">©</span>
+    <span className="sidebar-footer-copy-text">2025 Ink Dashboard</span>
+  </div>
+</div>
+
+
         </aside>
 
         {/* main content */}
@@ -4045,6 +4130,171 @@ const valueUsd =
           </div>
         </main>
       </div>
+      {isFeedbackOpen && (
+        <div
+          className='feedback-overlay'
+          onClick={() => setIsFeedbackOpen(false)}
+        >
+          <div
+            className='feedback-modal'
+            onClick={e => e.stopPropagation()}
+          >
+            <div className='feedback-modal-header'>
+              <h2 className='feedback-title'>
+                {feedbackCategory === 'contact'
+                  ? 'Contact Us'
+                  : 'Send feedback'}
+              </h2>
+
+  <button
+    className="feedback-close-btn"
+    onClick={() => setIsFeedbackOpen(false)}
+  >
+    ×
+  </button>
+            </div>
+
+{feedbackCategory !== 'contact' && (
+  <div className='feedback-type-row'>
+    <button
+      type='button'
+      className={
+        'feedback-type-chip' +
+        (feedbackCategory === 'feature' ? ' active' : '')
+      }
+      onClick={() => setFeedbackCategory('feature')}
+    >
+      Feature request
+    </button>
+
+    <button
+      type='button'
+      className={
+        'feedback-type-chip' +
+        (feedbackCategory === 'bug' ? ' active' : '')
+      }
+      onClick={() => setFeedbackCategory('bug')}
+    >
+      Bug report
+    </button>
+
+    <button
+      type='button'
+      className={
+        'feedback-type-chip' +
+        (feedbackCategory === 'idea' ? ' active' : '')
+      }
+      onClick={() => setFeedbackCategory('idea')}
+    >
+      Idea
+    </button>
+
+    <button
+      type='button'
+      className={
+        'feedback-type-chip' +
+        (feedbackCategory === 'other' ? ' active' : '')
+      }
+      onClick={() => setFeedbackCategory('other')}
+    >
+      Other
+    </button>
+  </div>
+)}
+
+
+
+            <div className='feedback-body'>
+              <label className='feedback-label'>
+                {feedbackCategory === 'contact'
+                  ? 'How can we help'
+                  : 'What is on your mind'}
+              </label>
+<textarea
+  className='feedback-textarea'
+  rows={4}
+  placeholder={
+    feedbackCategory === 'contact'
+      ? 'Describe what you need help with on inkfolio'
+      : 'Tell us what you like, what is broken, or what you want next on ink'
+  }
+  value={feedbackMessage}
+  onChange={e => setFeedbackMessage(e.target.value)}
+/>
+
+              <label className='feedback-label'>
+                {isContactMode ? 'Contact info (required)' : 'contact info (optional)'}
+              </label>
+              <input
+                className='feedback-input'
+                placeholder='@handle or email'
+                value={feedbackContact}
+                onChange={e => setFeedbackContact(e.target.value)}
+              />
+              {isContactMode && feedbackContact && !contactIsValid && (
+                <div className='feedback-error-text'>
+                  enter a valid email or @username
+                </div>
+              )}
+            </div>
+
+            <div className='feedback-footer-row'>
+              {feedbackStatus === 'ok' && (
+                <span className='feedback-status-ok'>
+                  Sent. Thank you for helping improve ink dashboard.
+                </span>
+              )}
+              {feedbackStatus === 'error' && (
+                <span className='feedback-status-error'>
+                  Could not send feedback. Try again later.
+                </span>
+              )}
+
+              <button
+                type='button'
+                className='feedback-submit-btn'
+                disabled={
+                  feedbackSending ||
+                  !feedbackMessage.trim() ||
+                  !contactIsValid
+                }
+                onClick={async () => {
+                  if (!feedbackMessage.trim()) return;
+                  try {
+                    setFeedbackSending(true);
+                    setFeedbackStatus('idle');
+
+                    const res = await fetch('/api/feedback', {
+                      method: 'POST',
+                      headers: { 'content-type': 'application/json' },
+                      body: JSON.stringify({
+                        message: feedbackMessage,
+                        category: feedbackCategory,
+                        contact: feedbackContact,
+                        wallet: walletAddress || null,
+                      }),
+                    });
+
+                    if (!res.ok) {
+                      throw new Error('bad status');
+                    }
+
+                    setFeedbackStatus('ok');
+                    setFeedbackMessage('');
+                  } catch (err) {
+                    console.error('feedback submit failed', err);
+                    setFeedbackStatus('error');
+                  } finally {
+                    setFeedbackSending(false);
+                  }
+                }}
+              >
+                {feedbackSending ? 'Sending…' : 'Send'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
