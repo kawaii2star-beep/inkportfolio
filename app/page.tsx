@@ -112,6 +112,7 @@ const PLATFORM_ICONS: Record<string, string> = {
 
   // Nado
   '0x05ec92d78ed421f3d3ada77ffde167106565974e': 'Nado',
+  
   // add more later here...
 
   // Li.fi
@@ -145,7 +146,6 @@ const PROTOCOL_ICONS: Record<string, string> = {
   Velodrome: 'velodrome',
   Inkyswap: 'Inkyswap',
   Nado: 'Nado',
-
 };
 
   // ADD MORE for YIELDING Links /////

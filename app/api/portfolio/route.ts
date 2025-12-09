@@ -8,6 +8,9 @@ const RPC_URL =
   process.env.NEXT_PUBLIC_INK_RPC || 'https://rpc-gel.inkonchain.com';
 
 const BLOCKSCOUT_BASE = 'https://explorer.inkonchain.com/api/v2';
+const BLOCKSCOUT_RPC_BASE = 'https://explorer.inkonchain.com/api';
+
+const CREATOR_CACHE: Record<string, string | null> = {};
 
 const NADO_MARGIN_CONTRACT =
   '0x05ec92d78ed421f3d3ada77ffde167106565974e'.toLowerCase();
