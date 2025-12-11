@@ -228,7 +228,7 @@ const RefreshIcon = () => (
   </svg>
 );
 
-type PageKey = "Home" | "Swap" | "Test" | "Batch Send" | "Explore" | "About Us";
+type PageKey = "Home" | "Swap" | "Batch Send" | "Ecosystem" | "Explore" | "Language";
 
 type TokenHolding = {
   address: string;
@@ -576,7 +576,7 @@ const [txCopiedKey, setTxCopiedKey] = useState<string | null>(null);
   const [tokenIcons, setTokenIcons] = useState<{ [addr: string]: string }>({});
 
   // history range and data
-  const [historyRange, setHistoryRange] = useState<HistoryRange>("1W");
+  const [historyRange, setHistoryRange] = useState<HistoryRange>("24H");
   const [netWorthHistory, setNetWorthHistory] = useState<HistoryPoint[]>([]);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const [positionsTab, setPositionsTab] = useState<PositionsTab>("wallet");
@@ -1298,29 +1298,34 @@ const refreshAll = async (addrOverride?: string) => {
     setHistoryRange(range);
   };
 
-  // ------------- chart + % since last refresh -------------
 
-  const latestPoint =
-    netWorthHistory.length > 0
-      ? netWorthHistory[netWorthHistory.length - 1]
-      : null;
-  const previousPoint =
-    netWorthHistory.length > 1
-      ? netWorthHistory[netWorthHistory.length - 2]
-      : null;
+// use first point in current range as baseline
+const latestPoint =
+  netWorthHistory.length > 0
+    ? netWorthHistory[netWorthHistory.length - 1]
+    : null;
 
-  const latest =
-    latestPoint?.v ?? portfolio?.totalValueUsd ?? 0;
-  const previous = previousPoint?.v ?? latest;
+const firstPoint =
+  netWorthHistory.length > 0 ? netWorthHistory[0] : null;
 
-  const changePct =
-    previous === 0 ? 0 : ((latest - previous) / previous) * 100;
+const latest =
+  latestPoint?.v ?? portfolio?.totalValueUsd ?? 0;
 
-  const isUp = changePct >= 0;
+const base = firstPoint?.v ?? latest;
 
-  const currentValue = latest;
-  const changeAbs = latest - previous;
-  const hasHistory = netWorthHistory.length > 1;
+// dollar change over the whole range, for example 1000 → 1050 gives +50
+const changeAbs = latest - base;
+
+// percent change over the whole range, for example 1000 → 1050 gives +5
+const changePct =
+  base === 0 ? 0 : ((latest - base) / base) * 100;
+
+// chart up or down uses full range change now
+const isUp = changePct >= 0;
+
+const currentValue = latest;
+const hasHistory = netWorthHistory.length > 1;
+
 
 
   let linePoints = "";
@@ -1400,14 +1405,15 @@ useEffect(() => {
 
   const mainClass = isPinned ? "main main-pinned" : "main main-floating";
 
-  const pageTitles: Record<PageKey, string> = {
-    Home: "Home",
-    Swap: "Swap",
-    Test: "Test",
-    "Batch Send": "Batch",
-    Explore: "Explore",
-    "About Us": "About",
-  };
+const pageTitles: Record<PageKey, string> = {
+  Home: "Home",
+  Swap: "Swap",
+  "Batch Send": "Batch Send",
+  Ecosystem: "Ink Ecosystem",
+  Explore: "Explore",
+  Language: "Language",
+};
+
 
   const totalValue = portfolio?.totalValueUsd ?? 0;
   const yieldingUsd = portfolio
@@ -1890,156 +1896,118 @@ onKeyDown={async (e) => {
           </div>
 
           {/* main nav items */}
-          <nav className="sidebar-nav">
-<button
-  className={`sidebar-item ${
-    activePage === 'Home' ? 'sidebar-item-active' : ''
-  }`}
-  onClick={() => {
-    setActivePage('Home');
+<nav className="sidebar-nav">
+  {/* Home */}
+  <button
+    className={`sidebar-item ${
+      activePage === "Home" ? "sidebar-item-active" : ""
+    }`}
+    onClick={() => {
+      setActivePage("Home");
 
-    if (connectedWallet && walletAddress.toLowerCase() !== connectedWallet.toLowerCase()) {
-      setWalletAddress(connectedWallet);
-      setSearchInput(connectedWallet);
+      if (
+        connectedWallet &&
+        walletAddress.toLowerCase() !== connectedWallet.toLowerCase()
+      ) {
+        setWalletAddress(connectedWallet);
+        setSearchInput(connectedWallet);
 
-      setNetWorthHistory([]);
-      setHoverIndex(null);
+        setNetWorthHistory([]);
+        setHoverIndex(null);
 
-      refreshAll(connectedWallet);
-      loadNfts(connectedWallet);
-      loadNftSpent(connectedWallet);
-    }
-  }}
->
-              <span className="sidebar-icon-slot">
-                <span className="sidebar-icon">
-                  <HomeIcon />
-                </span>
-              </span>
-              <span className="sidebar-label">Home</span>
-            </button>
+        refreshAll(connectedWallet);
+        loadNfts(connectedWallet);
+        loadNftSpent(connectedWallet);
+      }
+    }}
+  >
+    
+    
+    <span className="sidebar-icon-slot">
+      <span className="sidebar-icon">
+        <HomeIcon />
+      </span>
+    </span>
+    <span className="sidebar-label">Home</span>
+  </button>
 
-            <button
-              className={`sidebar-item ${
-                activePage === "Swap" ? "sidebar-item-active" : ""
-              }`}
-              onClick={() => setActivePage("Swap")}
-            >
-              <span className="sidebar-icon-slot">
-                <span className="sidebar-icon">
-                  <ArrowsRightLeftIcon />
-                </span>
-              </span>
-              <span className="sidebar-label">Swap</span>
-            </button>
+  {/* Swap */}
+  <button
+    className={`sidebar-item ${
+      activePage === "Swap" ? "sidebar-item-active" : ""
+    }`}
+    onClick={() => setActivePage("Swap")}
+  >
+    <span className="sidebar-icon-slot">
+      <span className="sidebar-icon">
+        <ArrowsRightLeftIcon />
+      </span>
+    </span>
+    <span className="sidebar-label">Swap</span>
+  </button>
 
-            <button
-              className={`sidebar-item ${
-                activePage === "Test" ? "sidebar-item-active" : ""
-              }`}
-              onClick={() => setActivePage("Test")}
-            >
-              <span className="sidebar-icon-slot">
-                <span className="sidebar-icon">
-                  <PresentationChartBarIcon />
-                </span>
-              </span>
-              <span className="sidebar-label">Test</span>
-            </button>
+  {/* Batch Send */}
+  <button
+    className={`sidebar-item ${
+      activePage === "Batch Send" ? "sidebar-item-active" : ""
+    }`}
+    onClick={() => setActivePage("Batch Send")}
+  >
+    <span className="sidebar-icon-slot">
+      <span className="sidebar-icon">
+        <CubeIcon />
+      </span>
+    </span>
+    <span className="sidebar-label">Batch Send</span>
+  </button>
 
-            <button
-              className={`sidebar-item ${
-                activePage === "Batch Send" ? "sidebar-item-active" : ""
-              }`}
-              onClick={() => setActivePage("Batch Send")}
-            >
-              <span className="sidebar-icon-slot">
-                <span className="sidebar-icon">
-                  <CubeIcon />
-                </span>
-              </span>
-              <span className="sidebar-label">Batch Send</span>
-            </button>
+  {/* Ecosystem */}
+  <button
+    className={`sidebar-item ${
+      activePage === "Ecosystem" ? "sidebar-item-active" : ""
+    }`}
+    onClick={() => setActivePage("Ecosystem")}
+  >
+    <span className="sidebar-icon-slot">
+      <span className="sidebar-icon">
+        <PresentationChartBarIcon />
+      </span>
+    </span>
+    <span className="sidebar-label">Ink Ecosystem</span>
+  </button>
 
-            <button
-              className={`sidebar-item ${
-                activePage === "Explore" ? "sidebar-item-active" : ""
-              }`}
-              onClick={() => setActivePage("Explore")}
-            >
-              <span className="sidebar-icon-slot">
-                <span className="sidebar-icon">
-                  <MagnifyingGlassIcon />
-                </span>
-              </span>
-              <span className="sidebar-label">Explore</span>
-            </button>
+  {/* Explore */}
+  <button
+    className={`sidebar-item ${
+      activePage === "Explore" ? "sidebar-item-active" : ""
+    }`}
+    onClick={() => setActivePage("Explore")}
+  >
+    <span className="sidebar-icon-slot">
+      <span className="sidebar-icon">
+        <MagnifyingGlassIcon />
+      </span>
+    </span>
+    <span className="sidebar-label">Explore</span>
+  </button>
 
-            <button
-              className={`sidebar-item ${
-                activePage === "About Us" ? "sidebar-item-active" : ""
-              }`}
-              onClick={() => setActivePage("About Us")}
-            >
-              <span className="sidebar-icon-slot">
-                <span className="sidebar-icon">
-                  <InformationCircleIcon />
-                </span>
-              </span>
-              <span className="sidebar-label">About Us</span>
-            </button>
-          </nav>
+  {/* Language */}
+  <button
+    className={`sidebar-item ${
+      activePage === "Language" ? "sidebar-item-active" : ""
+    }`}
+    onClick={() => setActivePage("Language")}
+  >
+    <span className="sidebar-icon-slot">
+      <span className="sidebar-icon">
+        <GlobeAltIcon />
+      </span>
+    </span>
+    <span className="sidebar-label">English</span>
+  </button>
+</nav>
 
-          {/* section 2: settings */}
-          <section className="sidebar-section">
-            <button className="sidebar-item sidebar-item-secondary">
-              <span className="sidebar-icon-slot">
-                <span className="sidebar-icon">
-                  <Cog6ToothIcon />
-                </span>
-              </span>
-              <span className="sidebar-label">Settings</span>
-            </button>
 
-            <button className="sidebar-item sidebar-item-secondary">
-              <span className="sidebar-icon-slot">
-                <span className="sidebar-icon">
-                  <GlobeAltIcon />
-                </span>
-              </span>
-              <span className="sidebar-label">English</span>
-            </button>
-          </section>
-
-          {/* section 3: ink links */}
-          <section className="sidebar-section">
-            <button className="sidebar-item sidebar-item-secondary">
-              <span className="sidebar-icon-slot">
-                <span className="sidebar-icon">
-                  <ChartBarIcon />
-                </span>
-              </span>
-              <span className="sidebar-label">Reward Stats</span>
-            </button>
-
-            <button className="sidebar-item sidebar-item-secondary">
-              <span className="sidebar-icon-slot">
-                <span className="sidebar-icon">
-                  <DocumentTextIcon />
-                </span>
-              </span>
-              <span className="sidebar-label">Portfolio Coverage</span>
-            </button>
-
-            <button className="sidebar-item sidebar-item-secondary">
-              <span className="sidebar-icon-slot">
-                <span className="sidebar-icon">
-                  <MagnifyingGlassIcon />
-                </span>
-              </span>
-              <span className="sidebar-label">Ink Explorer</span>
-            </button>
-          </section>
 
 <div className="sidebar-divider"></div>
 {/* X button row above footer line */}
@@ -2052,18 +2020,18 @@ onKeyDown={async (e) => {
     <span className="sidebar-bottom-icon">
       <TwitterIconSvg />
     </span>
-    <span className="sidebar-twitter-label">follow us</span>
+    <span className="sidebar-twitter-label">Follow Us</span>
   </button>
 
   <button
     className='sidebar-footer-feedback'
-onClick={() => {
-  setFeedbackCategory('feature');
-  setFeedbackMessage('');
-  setFeedbackContact('');
-  setFeedbackStatus('idle');
-  setIsFeedbackOpen(true);
-}}
+    onClick={() => {
+      setFeedbackCategory('feature');
+      setFeedbackMessage('');
+      setFeedbackContact('');
+      setFeedbackStatus('idle');
+      setIsFeedbackOpen(true);
+    }}
   >
     <span className='sidebar-bottom-icon'>
       <ChatBubbleLeftRightIcon width={16} height={16} />
@@ -2073,13 +2041,13 @@ onClick={() => {
 
   <button
     className='sidebar-footer-contact'
-onClick={() => {
-  setFeedbackCategory('contact');
-  setFeedbackMessage('');
-  setFeedbackContact('');
-  setFeedbackStatus('idle');
-  setIsFeedbackOpen(true);
-}}
+    onClick={() => {
+      setFeedbackCategory('contact');
+      setFeedbackMessage('');
+      setFeedbackContact('');
+      setFeedbackStatus('idle');
+      setIsFeedbackOpen(true);
+    }}
   >
     <span className='sidebar-bottom-icon'>
       <EnvelopeIcon width={16} height={16} />
@@ -2089,10 +2057,8 @@ onClick={() => {
 </div>
 
 
-
 {/* footer links + copyright */}
 <div className="sidebar-footer">
-
   {/* text links (only when sidebar is open) */}
   <div className="sidebar-footer-links-row">
     <button className="sidebar-footer-link">About Us</button>
@@ -2401,7 +2367,6 @@ onClick={() => {
                   <div className="portfolio-networth-main premium-networth">
     <div className="portfolio-chart-wrapper">
       <div className="portfolio-chart-bg"></div>
-
       {activePoint && hoverX != null && (
         <div
           className="chart-tooltip"

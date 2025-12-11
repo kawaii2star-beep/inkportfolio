@@ -9,7 +9,7 @@ const ONE_DAY_MS = 24 * ONE_HOUR_MS
 type RangeKey = '24h' | '1w' | '1m'
 
 function getRangeConfig(rangeParam: string | null) {
-  let key: RangeKey = '1w'
+  let key: RangeKey = '24h'
 
   if (rangeParam === '24h' || rangeParam === '1w' || rangeParam === '1m') {
     key = rangeParam
