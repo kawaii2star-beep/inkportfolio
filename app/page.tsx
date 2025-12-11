@@ -17,8 +17,11 @@ import {
 } from "@heroicons/react/24/outline";
 
 import PreloadPlatformIcons from "./PreloadPlatformIcons";
+import SwapPanel from "./SwapPanel";
 import { ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
 import { EnvelopeIcon } from "@heroicons/react/24/outline";
+
+
 
 
 function getFavicon(url: string | null): string | null {
@@ -520,7 +523,7 @@ const [theme, setTheme] = useState<'light' | 'dark'>(() => {
   return 'light'
 })
 
-// ADD THIS
+// Theme
 const [mounted, setMounted] = useState(false)
 
 useEffect(() => {
@@ -2088,6 +2091,7 @@ onKeyDown={async (e) => {
 
         {/* main content */}
         <main className={mainClass}>
+          {activePage === "Home" && (
           <div className="main-inner">
             <div className="main-header-row">
               <div>
@@ -2132,6 +2136,12 @@ onKeyDown={async (e) => {
                     loading wallet...
                   </span>
                 </div>
+              )}
+
+{(activePage as string) === "Swap" && (
+                <section className="swap-panel-section">
+                  <SwapPanel theme={theme} />
+                </section>
               )}
 
               <div className="portfolio-header-grid">
@@ -4093,6 +4103,27 @@ const valueUsd =
 
 </section>
           </div>
+          )}
+          {activePage === "Swap" && (
+            <section className="swap-page">
+              <div className="swap-page-inner">
+                <div className="swap-page-header">
+                  <div>
+                    <h1 className="page-title">swap</h1>
+                    <p className="page-subtitle">
+                      trade tokens on ink with your connected wallet
+                    </p>
+                  </div>
+                </div>
+
+                <div className="swap-layout">
+                  <div className="swap-panel-wrapper">
+                    <SwapPanel theme={theme} />
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
         </main>
       </div>
       {isFeedbackOpen && (

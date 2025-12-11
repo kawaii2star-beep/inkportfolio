@@ -6096,3 +6096,289 @@ body[data-theme='dark'] .search-wrapper {
   opacity: 0.45;
   color: #e5e7eb;
 }
+
+.swap-page {
+  padding-top: 16px;
+}
+
+.swap-widget-wrapper {
+  margin-top: 24px;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.swap-panel-section {
+  margin-top: 16px;
+  margin-bottom: 24px;
+}
+
+.swap-panel-container {
+  width: 100%;
+  min-height: 520px;
+  border-radius: 18px;
+  overflow: hidden;
+}
+.swap-panel-section {
+  margin-top: 16px;
+  margin-bottom: 24px;
+}
+
+.swap-panel-container {
+  width: 100%;
+  min-height: 160px;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.swap-panel-placeholder {
+  font-size: 14px;
+  color: #9ca3af;
+  text-align: center;
+}
+.swap-page {
+  padding: 24px 0;
+}
+
+.swap-page-inner {
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+.swap-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.swap-layout {
+  display: flex;
+  gap: 24px;
+}
+
+/* center the swap panel nicely */
+.swap-panel-wrapper {
+  flex: 1;
+  border-radius: 18px;
+}
+
+/* make sure our dummy SwapPanel looks ok */
+.swap-panel-container {
+  width: 100%;
+  min-height: 420px;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.swap-panel-placeholder {
+  font-size: 14px;
+  color: #9ca3af;
+  text-align: center;
+}
+.swap-panel-root {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 0 40px;
+}
+
+.swap-card {
+  width: 100%;
+  max-width: 540px;
+  border-radius: 24px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: radial-gradient(circle at top left, rgba(168, 85, 247, 0.12), transparent 55%),
+              rgba(15, 23, 42, 0.9);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.85);
+  padding: 20px 20px 18px;
+}
+
+.swap-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.swap-card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #e5e7eb;
+}
+
+.swap-card-subtitle {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: 2px;
+}
+
+.swap-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.swap-field {
+  padding: 10px 10px 12px;
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(55, 65, 81, 0.9);
+}
+
+.swap-field-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.swap-field-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: #9ca3af;
+}
+
+.swap-balance-text {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.swap-field-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.swap-amount-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 20px;
+  font-weight: 500;
+  color: #e5e7eb;
+}
+
+.swap-amount-input::placeholder {
+  color: #4b5563;
+}
+
+.swap-token-select {
+  min-width: 110px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  background: radial-gradient(circle at top left, rgba(129, 140, 248, 0.4), rgba(30, 64, 175, 0.9));
+  color: #f9fafb;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 12px;
+  outline: none;
+  appearance: none;
+}
+
+.swap-flip-btn {
+  align-self: center;
+  margin: 2px 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: 1px solid rgba(75, 85, 99, 0.9);
+  background: #020617;
+  color: #9ca3af;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.swap-flip-btn:hover {
+  background: #020617;
+  transform: translateY(-1px);
+}
+
+.swap-submit-btn {
+  margin-top: 14px;
+  width: 100%;
+  border-radius: 999px;
+  border: 0;
+  background: linear-gradient(135deg, #a855f7, #6366f1);
+  color: #f9fafb;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 16px 40px rgba(79, 70, 229, 0.65);
+}
+
+.swap-submit-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+  box-shadow: none;
+}
+
+.swap-footer-row {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.swap-footer-label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.swap-footer-value {
+  color: #9ca3af;
+}
+.swap-panel-root {
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 16px 0 32px;
+}
+.swap-panel-root {
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 16px 0 32px;
+}
+
+.swap-iframe {
+  width: 100%;
+  min-height: 640px;
+  border: 0;
+  border-radius: 24px;
+  overflow: hidden;
+}
+.swap-panel-root {
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 16px 0 32px;
+}
+
+.swap-widget-loading,
+.swap-widget-fallback {
+  min-height: 260px;
+  border-radius: 24px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(15, 23, 42, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: #9ca3af;
+  text-align: center;
+  gap: 4px;
+}
