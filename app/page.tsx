@@ -1778,7 +1778,7 @@ onKeyDown={async (e) => {
 </button>
 
 
-{connectedWallet ? (
+{mounted && connectedWallet ? (
   <button
     type='button'
     className='connect-wallet-btn'
@@ -1802,9 +1802,10 @@ onKeyDown={async (e) => {
       connect({ connector })
     }}
   >
-    {isConnectingWallet ? 'connecting...' : 'connect wallet'}
+    {!mounted ? 'connect wallet' : isConnectingWallet ? 'connecting...' : 'connect wallet'}
   </button>
 )}
+
 
         </div>
       </header>
@@ -2079,12 +2080,15 @@ onKeyDown={async (e) => {
                     <div className="wallet-label-row">
                       <span className="wallet-label">INK Wallet</span>
 <span className="wallet-status-pill">
-  {isViewingConnectedWallet
+  {!mounted
+    ? "Not connected"
+    : isViewingConnectedWallet
     ? "Connected"
     : connectedWallet
     ? "Watching"
     : "Not connected"}
 </span>
+
 
                     </div>
 <div
