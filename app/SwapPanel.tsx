@@ -1,15 +1,28 @@
 // app/SwapPanel.tsx
 'use client';
 
+import dynamic from 'next/dynamic';
 import type { WidgetConfig } from '@lifi/widget';
-import { LiFiWidget, WidgetSkeleton } from '@lifi/widget';
-import { ClientOnly } from './ClientOnly';
 
 type SwapPanelProps = {
   theme: 'light' | 'dark';
+  onConnectWallet?: () => void;
 };
 
-export default function SwapPanel({ theme }: SwapPanelProps) {
+// load LiFi widget only on the client
+const LiFiWidget = dynamic(
+  () => import('@lifi/widget').then((mod) => mod.LiFiWidget),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="swap-widget-skeleton">
+        loading swap widget...
+      </div>
+    ),
+  }
+);
+
+export default function SwapPanel({ theme, onConnectWallet }: SwapPanelProps) {
   const config: Partial<WidgetConfig> =
     theme === 'dark'
       ? {
@@ -41,6 +54,9 @@ export default function SwapPanel({ theme }: SwapPanelProps) {
               boxShadow: '0px 24px 60px rgba(15,23,42,0.9)',
             },
           },
+          walletConfig: {
+            onConnect: onConnectWallet ?? (() => {}),
+          },
         }
       : {
           appearance: 'light',
@@ -71,13 +87,14 @@ export default function SwapPanel({ theme }: SwapPanelProps) {
               boxShadow: '0px 18px 40px rgba(15,23,42,0.45)',
             },
           },
+          walletConfig: {
+            onConnect: onConnectWallet ?? (() => {}),
+          },
         };
 
   return (
-    <div className='swap-panel-root'>
-      <ClientOnly fallback={<WidgetSkeleton config={config} />}>
-        <LiFiWidget config={config} integrator='ink-dashboard' />
-      </ClientOnly>
+    <div className="swap-panel-root">
+      <LiFiWidget config={config} integrator="ink-dashboard" />
     </div>
   );
 }

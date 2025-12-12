@@ -20,6 +20,10 @@ import PreloadPlatformIcons from "./PreloadPlatformIcons";
 import SwapPanel from "./SwapPanel";
 import { ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
 import { EnvelopeIcon } from "@heroicons/react/24/outline";
+import { WagmiProvider, createConfig, http, useConnect, useDisconnect } from 'wagmi';
+import { injected } from 'wagmi/connectors';
+import { createClient, defineChain } from 'viem';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 
 
@@ -35,6 +39,46 @@ function getFavicon(url: string | null): string | null {
 }
 
 const BLOCKSCOUT_BASE = 'https://explorer.inkonchain.com/api/v2';
+
+const INK_CHAIN_ID = 57073;
+
+const inkChain = defineChain({
+  id: INK_CHAIN_ID,
+  name: 'Ink',
+  nativeCurrency: {
+    name: 'Ether',
+    symbol: 'ETH',
+    decimals: 18,
+  },
+  rpcUrls: {
+    default: {
+      http: ['https://rpc-gel.inkonchain.com'],
+    },
+    public: {
+      http: ['https://rpc-gel.inkonchain.com'],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: 'Ink Explorer',
+      url: 'https://explorer.inkonchain.com',
+    },
+  },
+});
+
+const wagmiConfig = createConfig({
+  chains: [inkChain],
+  connectors: [injected()],
+  client({ chain }) {
+    return createClient({
+      chain,
+      transport: http(),
+    });
+  },
+  ssr: true,
+});
+
+const queryClient = new QueryClient();
 
 async function resolveInkDomain(name: string): Promise<string | null> {
   const query = name.trim().toLowerCase();
@@ -511,7 +555,10 @@ function isValidContactInfo(input: string): boolean {
 
 
 
-export default function HomePage() {
+function HomePageInner() {
+  const { connectAsync, connectors } = useConnect();
+const { disconnectAsync } = useDisconnect();
+const injectedConnector = connectors.find((c) => c.id === 'injected');
   const [activePage, setActivePage] = useState<PageKey>("Home");
   const [isPinned, setIsPinned] = useState(false);
 const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -522,6 +569,20 @@ const [theme, setTheme] = useState<'light' | 'dark'>(() => {
 
   return 'light'
 })
+
+useEffect(() => {
+  if (typeof window === 'undefined') return;
+
+  const warmUp = () => {
+    import('@lifi/widget');
+  };
+
+  if ('requestIdleCallback' in window) {
+    (window as any).requestIdleCallback(warmUp);
+  } else {
+    setTimeout(warmUp, 1500);
+  }
+}, []);
 
 // Theme
 const [mounted, setMounted] = useState(false)
@@ -1146,66 +1207,46 @@ useEffect(() => {
   };
 }, [connectedWallet]);
 
- // connecExtention
 
- const connectExtensionWallet = async () => {
+// connecExtention
+const connectExtensionWallet = async () => {
   if (typeof window === 'undefined') {
     alert('Wallet connection only works in a browser');
-    return;
-  }
-
-  const eth = (window as any).ethereum;
-  if (!eth) {
-    alert('No extension wallet detected. Install MetaMask, Rabby, Kraken or similar then try again');
     return;
   }
 
   try {
     setIsConnectingWallet(true);
 
-    const accounts: string[] = await eth.request({
-      method: 'eth_requestAccounts',
-    });
-
-    const first = accounts && accounts[0];
-    if (!first) {
-      alert('No account returned from wallet');
+    if (!injectedConnector) {
+      alert(
+        'No browser wallet detected. Install MetaMask, Rabby, Kraken or Kraken Wallet then try again'
+      );
       return;
     }
 
-    const addr = first.toLowerCase();
+    // ask wagmi to connect the injected wallet on Ink
+    const result = await connectAsync({
+      connector: injectedConnector,
+      chainId: INK_CHAIN_ID,
+    });
+
+    const addr =
+      (result.accounts &&
+        result.accounts[0] &&
+        result.accounts[0].toLowerCase()) ||
+      '';
+
+    if (!addr) {
+      alert('No account returned from wallet');
+      return;
+    }
 
     // save real connected wallet
     setConnectedWallet(addr);
 
     if (typeof window !== 'undefined') {
-  window.localStorage.setItem(LAST_WALLET_KEY, addr);
-}
-
-    // make sure we are on Ink
-    const targetChainIdHex = '0xdef1'; // 57073
-    try {
-      const currentChainId = await eth.request({ method: 'eth_chainId' });
-      if (currentChainId !== targetChainIdHex) {
-        await eth.request({
-          method: 'wallet_addEthereumChain',
-          params: [
-            {
-              chainId: targetChainIdHex,
-              chainName: 'Ink',
-              rpcUrls: ['https://rpc-gel.inkonchain.com'],
-              blockExplorerUrls: ['https://explorer.inkonchain.com'],
-              nativeCurrency: {
-                name: 'Ether',
-                symbol: 'ETH',
-                decimals: 18,
-              },
-            },
-          ],
-        });
-      }
-    } catch (chainErr) {
-      console.error('failed to ensure Ink network', chainErr);
+      window.localStorage.setItem(LAST_WALLET_KEY, addr);
     }
 
     // update UI state
@@ -1225,7 +1266,6 @@ useEffect(() => {
 
     // load portfolio + history right away
     await refreshAll(addr);
-
   } catch (err) {
     console.error('connectExtensionWallet error', err);
     alert('Wallet connection failed');
@@ -1234,9 +1274,16 @@ useEffect(() => {
   }
 };
 
-const disconnectWallet = () => {
 
-    if (typeof window !== 'undefined') {
+
+const disconnectWallet = async () => {
+  try {
+    await disconnectAsync();
+  } catch (err) {
+    console.error('wagmi disconnect failed', err);
+  }
+
+  if (typeof window !== 'undefined') {
     window.localStorage.removeItem(LAST_WALLET_KEY);
   }
 
@@ -1258,6 +1305,7 @@ const disconnectWallet = () => {
   setPerCollectionSpentUsd({});
   setTotalNftSpentUsd(0);
 };
+
 
 
 
@@ -2136,12 +2184,6 @@ onKeyDown={async (e) => {
                     loading wallet...
                   </span>
                 </div>
-              )}
-
-{(activePage as string) === "Swap" && (
-                <section className="swap-panel-section">
-                  <SwapPanel theme={theme} />
-                </section>
               )}
 
               <div className="portfolio-header-grid">
@@ -4116,11 +4158,14 @@ const valueUsd =
                   </div>
                 </div>
 
-                <div className="swap-layout">
-                  <div className="swap-panel-wrapper">
-                    <SwapPanel theme={theme} />
-                  </div>
-                </div>
+<div className="swap-layout">
+  <div className="swap-panel-wrapper">
+    <SwapPanel
+      theme={theme}
+      onConnectWallet={connectExtensionWallet}
+    />
+  </div>
+</div>
               </div>
             </section>
           )}
@@ -4292,5 +4337,15 @@ const valueUsd =
         </div>
       )}
     </>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <WagmiProvider config={wagmiConfig}>
+      <QueryClientProvider client={queryClient}>
+        <HomePageInner />
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 }
