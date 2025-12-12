@@ -20,6 +20,7 @@ import PreloadPlatformIcons from "./PreloadPlatformIcons";
 import { ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
 import { EnvelopeIcon } from "@heroicons/react/24/outline";
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
+import SwapPanel from './SwapPanel'
 
 
 
@@ -1327,14 +1328,26 @@ useEffect(() => {
 
   const mainClass = isPinned ? "main main-pinned" : "main main-floating";
 
+  
 const pageTitles: Record<PageKey, string> = {
-  Home: "Home",
-  Swap: "Swap",
-  "Batch Send": "Batch Send",
-  Ecosystem: "Ink Ecosystem",
-  Explore: "Explore",
-  Language: "Language",
-};
+  Home: 'Ink Dashboard',
+  Swap: 'Ink Dashboard',
+  'Batch Send': 'Ink Dashboard',
+  Ecosystem: 'Ink Dashboard',
+  Explore: 'Ink Dashboard',
+  Language: 'Ink Dashboard',
+}
+
+const pageSubtitles: Record<PageKey, string> = {
+  Home: 'simple overview of your ink portfolio',
+  Swap: 'swap & bridge to ink',
+  'Batch Send': 'batch send',
+  Ecosystem: 'ink ecosystem',
+  Explore: 'explore',
+  Language: 'language',
+}
+
+
 
 
   const totalValue = portfolio?.totalValueUsd ?? 0;
@@ -2022,36 +2035,38 @@ onKeyDown={async (e) => {
         {/* main content */}
         <main className={mainClass}>
           <div className="main-inner">
-            <div className="main-header-row">
-              <div>
-                <h1 className="page-title">ink dashboard</h1>
-                <p className="page-subtitle">
-                  simple overview of your ink portfolio
-                </p>
-              </div>
 
-              <div className="main-header-right">
-                <span className="last-updated-text">
-                  {walletAddress && lastUpdatedAt
-                    ? `last updated ${formatLastUpdated(lastUpdatedAt)}`
-                    : walletAddress
-                    ? "no data yet"
-                    : "enter a wallet to start"}
-                </span>
 
-<button
-  className="refresh-round-btn"
-  onClick={() => refreshAll()}
-  disabled={isRefreshing || !walletAddress}
->
 
-                  <span className={isRefreshing ? "spin-refresh" : ""}>
-                    <RefreshIcon />
-                  </span>
-                </button>
-              </div>
-            </div>
+<div className="main-header-row">
+  <div>
+    <h1 className="page-title">Ink Dashboard</h1>
+    <p className="page-subtitle">{pageSubtitles[activePage]}</p>
+  </div>
 
+  <div className="main-header-right">
+    <span className="last-updated-text">
+      {walletAddress && lastUpdatedAt
+        ? `last updated ${formatLastUpdated(lastUpdatedAt)}`
+        : walletAddress
+        ? "no data yet"
+        : "enter a wallet to start"}
+    </span>
+
+    <button
+      className="refresh-round-btn"
+      onClick={() => refreshAll()}
+      disabled={isRefreshing || !walletAddress}
+    >
+      <span className={isRefreshing ? "spin-refresh" : ""}>
+        <RefreshIcon />
+      </span>
+    </button>
+  </div>
+</div>
+
+{activePage === 'Home' && (
+  <>
                       {/* portfolio header card */}
             <div
               className={`portfolio-header-card ${
@@ -2066,12 +2081,6 @@ onKeyDown={async (e) => {
                   </span>
                 </div>
               )}
-
-                            {activePage === "Swap" && (
-                <section className="swap-panel-section">
-                </section>
-              )}
-
 
               <div className="portfolio-header-grid">
                 {/* left side: wallet identity + quick actions */}
@@ -2111,7 +2120,6 @@ onKeyDown={async (e) => {
   )}
 
 
-                      <span className="wallet-address-text">
 <span className="wallet-address-text">
   {walletAddress
     ? isViewingConnectedWallet
@@ -2133,9 +2141,6 @@ onKeyDown={async (e) => {
 )}
 
 </span>
-
-
-                      </span>
 
 {walletAddress && (
   <div className="wallet-tools">
@@ -4034,6 +4039,73 @@ const valueUsd =
   </div>
 
 </section>
+  </>
+)}
+
+{activePage === 'Swap' && (
+  <section className="positions-section">
+    <div className="ink-divider"></div>
+        <div className="positions-header-row">
+      <div className="portfolio-title-stack">
+        <div className="section-title">SWAP</div>
+        <div className="section-subtitle">powered by li.fi</div>
+              </div>
+    </div>
+    <div style={{ marginTop: 12 }}>
+      <SwapPanel theme={theme} />
+    </div>
+  </section>
+)}
+
+
+{activePage === 'Batch Send' && (
+  <section className="positions-section">
+    <div className="ink-divider"></div>
+    <div className="positions-header-row">
+      <div className="portfolio-title-stack">
+        <div className="section-title">BATCH SEND</div>
+        <div className="section-subtitle">coming soon</div>
+      </div>
+    </div>
+  </section>
+)}
+
+{activePage === 'Ecosystem' && (
+  <section className="positions-section">
+    <div className="ink-divider"></div>
+    <div className="positions-header-row">
+      <div className="portfolio-title-stack">
+        <div className="section-title">INK ECOSYSTEM</div>
+        <div className="section-subtitle">coming soon</div>
+      </div>
+    </div>
+  </section>
+)}
+
+{activePage === 'Explore' && (
+  <section className="positions-section">
+    <div className="ink-divider"></div>
+    <div className="positions-header-row">
+      <div className="portfolio-title-stack">
+        <div className="section-title">EXPLORE</div>
+        <div className="section-subtitle">coming soon</div>
+      </div>
+    </div>
+  </section>
+)}
+
+{activePage === 'Language' && (
+  <section className="positions-section">
+    <div className="ink-divider"></div>
+    <div className="positions-header-row">
+      <div className="portfolio-title-stack">
+        <div className="section-title">LANGUAGE</div>
+        <div className="section-subtitle">coming soon</div>
+      </div>
+    </div>
+  </section>
+)}
+
           </div>
         </main>
       </div>

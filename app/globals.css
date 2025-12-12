@@ -6382,3 +6382,31 @@ body[data-theme='dark'] .search-wrapper {
   text-align: center;
   gap: 4px;
 }
+
+
+.swap-page {
+  padding-top: 12px;
+}
+
+.swap-empty-card {
+  border-radius: 24px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  padding: 18px;
+  min-height: 520px;
+}
+
+.swap-empty-title {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.swap-empty-sub {
+  margin-top: 6px;
+  opacity: 0.7;
+  font-size: 12px;
+}
+
+.swap-widget-slot {
+  margin-top: 14px;
+  height: 100%;
+}
