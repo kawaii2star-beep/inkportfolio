@@ -17,13 +17,9 @@ import {
 } from "@heroicons/react/24/outline";
 
 import PreloadPlatformIcons from "./PreloadPlatformIcons";
-import SwapPanel from "./SwapPanel";
 import { ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
 import { EnvelopeIcon } from "@heroicons/react/24/outline";
-import { WagmiProvider, createConfig, http, useConnect, useDisconnect } from 'wagmi';
-import { injected } from 'wagmi/connectors';
-import { createClient, defineChain } from 'viem';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useAccount, useConnect, useDisconnect } from 'wagmi'
 
 
 
@@ -39,46 +35,6 @@ function getFavicon(url: string | null): string | null {
 }
 
 const BLOCKSCOUT_BASE = 'https://explorer.inkonchain.com/api/v2';
-
-const INK_CHAIN_ID = 57073;
-
-const inkChain = defineChain({
-  id: INK_CHAIN_ID,
-  name: 'Ink',
-  nativeCurrency: {
-    name: 'Ether',
-    symbol: 'ETH',
-    decimals: 18,
-  },
-  rpcUrls: {
-    default: {
-      http: ['https://rpc-gel.inkonchain.com'],
-    },
-    public: {
-      http: ['https://rpc-gel.inkonchain.com'],
-    },
-  },
-  blockExplorers: {
-    default: {
-      name: 'Ink Explorer',
-      url: 'https://explorer.inkonchain.com',
-    },
-  },
-});
-
-const wagmiConfig = createConfig({
-  chains: [inkChain],
-  connectors: [injected()],
-  client({ chain }) {
-    return createClient({
-      chain,
-      transport: http(),
-    });
-  },
-  ssr: true,
-});
-
-const queryClient = new QueryClient();
 
 async function resolveInkDomain(name: string): Promise<string | null> {
   const query = name.trim().toLowerCase();
@@ -555,10 +511,7 @@ function isValidContactInfo(input: string): boolean {
 
 
 
-function HomePageInner() {
-  const { connectAsync, connectors } = useConnect();
-const { disconnectAsync } = useDisconnect();
-const injectedConnector = connectors.find((c) => c.id === 'injected');
+export default function HomePage() {
   const [activePage, setActivePage] = useState<PageKey>("Home");
   const [isPinned, setIsPinned] = useState(false);
 const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -569,20 +522,6 @@ const [theme, setTheme] = useState<'light' | 'dark'>(() => {
 
   return 'light'
 })
-
-useEffect(() => {
-  if (typeof window === 'undefined') return;
-
-  const warmUp = () => {
-    import('@lifi/widget');
-  };
-
-  if ('requestIdleCallback' in window) {
-    (window as any).requestIdleCallback(warmUp);
-  } else {
-    setTimeout(warmUp, 1500);
-  }
-}, []);
 
 // Theme
 const [mounted, setMounted] = useState(false)
@@ -609,10 +548,17 @@ useEffect(() => {
 }, [])
 
   // real wallet and search input
-const [connectedWallet, setConnectedWallet] = useState<string | null>(null); // real connected wallet
-const [walletAddress, setWalletAddress] = useState<string>('');             // currently viewed wallet
-const [searchInput, setSearchInput] = useState<string>('');
-const [isConnectingWallet, setIsConnectingWallet] = useState(false);
+const [walletAddress, setWalletAddress] = useState<string>('')   // currently viewed wallet
+const [searchInput, setSearchInput] = useState<string>('')
+
+// wagmi wallet state
+const { address } = useAccount()
+const { connect, connectors, isPending: isConnectPending } = useConnect()
+const { disconnect } = useDisconnect()
+
+const connectedWallet = address ? address.toLowerCase() : null
+const isConnectingWallet = isConnectPending
+
 const [ensName, setEnsName] = useState<string | null>(null);
 const [connectedEnsName, setConnectedEnsName] = useState<string | null>(null);
 
@@ -687,26 +633,30 @@ const [gmStats, setGmStats] = useState<GmStats>({
 
 const [showQrModal, setShowQrModal] = useState(false);
 
-const LAST_WALLET_KEY = 'inkdash_last_connected_wallet';
+
 
 useEffect(() => {
-  if (typeof window === 'undefined') return;
+  if (!address) return
 
-  const stored = window.localStorage.getItem(LAST_WALLET_KEY);
-  if (!stored) return;
+  const addr = address.toLowerCase()
 
-  const addr = stored.toLowerCase();
+  // set default viewed wallet if empty
+  setWalletAddress(prev => prev || addr)
+  setSearchInput(prev => prev || addr)
 
-  setConnectedWallet(addr);
-  setWalletAddress(addr);
-  setSearchInput(addr);
-
-  // hydrate data for that wallet
-  refreshAll(addr);
-  loadNfts(addr);
-  loadNftSpent(addr);
-}, []);
-
+  // register for hourly tracking
+  ;(async () => {
+    try {
+      await fetch('/api/tracked-wallet', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ wallet: addr }),
+      })
+    } catch (err) {
+      console.error('tracked-wallet call failed', err)
+    }
+  })()
+}, [address])
 
 // try to get token icon from backend that proxies Dexscreener
 const fetchDexIcon = async (address: string) => {
@@ -1208,105 +1158,26 @@ useEffect(() => {
 }, [connectedWallet]);
 
 
-// connecExtention
-const connectExtensionWallet = async () => {
-  if (typeof window === 'undefined') {
-    alert('Wallet connection only works in a browser');
-    return;
-  }
+const handleDisconnect = () => {
+  disconnect()
 
-  try {
-    setIsConnectingWallet(true);
+  setWalletAddress('')
+  setSearchInput('')
+  setPortfolio(null)
 
-    if (!injectedConnector) {
-      alert(
-        'No browser wallet detected. Install MetaMask, Rabby, Kraken or Kraken Wallet then try again'
-      );
-      return;
-    }
+  setNetWorthHistory([])
+  setHoverIndex(null)
 
-    // ask wagmi to connect the injected wallet on Ink
-    const result = await connectAsync({
-      connector: injectedConnector,
-      chainId: INK_CHAIN_ID,
-    });
+  setTxs([])
+  setTxPage(1)
+  setTxHasMore(false)
+  setTxSelectedToken(null)
+  setTxTokenQuery('')
 
-    const addr =
-      (result.accounts &&
-        result.accounts[0] &&
-        result.accounts[0].toLowerCase()) ||
-      '';
-
-    if (!addr) {
-      alert('No account returned from wallet');
-      return;
-    }
-
-    // save real connected wallet
-    setConnectedWallet(addr);
-
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem(LAST_WALLET_KEY, addr);
-    }
-
-    // update UI state
-    setWalletAddress(addr);
-    setSearchInput(addr);
-
-    // register for hourly tracking
-    try {
-      await fetch('/api/tracked-wallet', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ wallet: addr }),
-      });
-    } catch (trackErr) {
-      console.error('tracked-wallet call failed', trackErr);
-    }
-
-    // load portfolio + history right away
-    await refreshAll(addr);
-  } catch (err) {
-    console.error('connectExtensionWallet error', err);
-    alert('Wallet connection failed');
-  } finally {
-    setIsConnectingWallet(false);
-  }
-};
-
-
-
-const disconnectWallet = async () => {
-  try {
-    await disconnectAsync();
-  } catch (err) {
-    console.error('wagmi disconnect failed', err);
-  }
-
-  if (typeof window !== 'undefined') {
-    window.localStorage.removeItem(LAST_WALLET_KEY);
-  }
-
-  setConnectedWallet(null);
-  setWalletAddress('');
-  setSearchInput('');
-  setPortfolio(null);
-
-  setNetWorthHistory([]);
-  setHoverIndex(null);
-
-  setTxs([]);
-  setTxPage(1);
-  setTxHasMore(false);
-  setTxSelectedToken(null);
-  setTxTokenQuery('');
-
-  setNftCollections(null);
-  setPerCollectionSpentUsd({});
-  setTotalNftSpentUsd(0);
-};
-
-
+  setNftCollections(null)
+  setPerCollectionSpentUsd({})
+  setTotalNftSpentUsd(0)
+}
 
 
   // manual refresh: refresh portfolio, write snapshot, reload history
@@ -1911,20 +1782,30 @@ onKeyDown={async (e) => {
   <button
     type='button'
     className='connect-wallet-btn'
-    onClick={disconnectWallet}
+    onClick={handleDisconnect}
   >
-    {(connectedEnsName || `${connectedWallet.substring(0, 6)}...${connectedWallet.substring(connectedWallet.length - 4)}`)} • disconnect
+    {(connectedEnsName ||
+      `${connectedWallet.substring(0, 6)}...${connectedWallet.substring(
+        connectedWallet.length - 4
+      )}`)} • disconnect
   </button>
 ) : (
-
   <button
     type='button'
     className='connect-wallet-btn'
-    onClick={connectExtensionWallet}
+    onClick={() => {
+      const connector = connectors[0]
+      if (!connector) {
+        console.error('no wagmi connector found')
+        return
+      }
+      connect({ connector })
+    }}
   >
     {isConnectingWallet ? 'connecting...' : 'connect wallet'}
   </button>
 )}
+
         </div>
       </header>
 
@@ -2139,7 +2020,6 @@ onKeyDown={async (e) => {
 
         {/* main content */}
         <main className={mainClass}>
-          {activePage === "Home" && (
           <div className="main-inner">
             <div className="main-header-row">
               <div>
@@ -2185,6 +2065,12 @@ onKeyDown={async (e) => {
                   </span>
                 </div>
               )}
+
+                            {activePage === "Swap" && (
+                <section className="swap-panel-section">
+                </section>
+              )}
+
 
               <div className="portfolio-header-grid">
                 {/* left side: wallet identity + quick actions */}
@@ -4145,30 +4031,6 @@ const valueUsd =
 
 </section>
           </div>
-          )}
-          {activePage === "Swap" && (
-            <section className="swap-page">
-              <div className="swap-page-inner">
-                <div className="swap-page-header">
-                  <div>
-                    <h1 className="page-title">swap</h1>
-                    <p className="page-subtitle">
-                      trade tokens on ink with your connected wallet
-                    </p>
-                  </div>
-                </div>
-
-<div className="swap-layout">
-  <div className="swap-panel-wrapper">
-    <SwapPanel
-      theme={theme}
-      onConnectWallet={connectExtensionWallet}
-    />
-  </div>
-</div>
-              </div>
-            </section>
-          )}
         </main>
       </div>
       {isFeedbackOpen && (
@@ -4337,15 +4199,5 @@ const valueUsd =
         </div>
       )}
     </>
-  );
-}
-
-export default function HomePage() {
-  return (
-    <WagmiProvider config={wagmiConfig}>
-      <QueryClientProvider client={queryClient}>
-        <HomePageInner />
-      </QueryClientProvider>
-    </WagmiProvider>
   );
 }
