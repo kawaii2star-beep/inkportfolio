@@ -2044,13 +2044,14 @@ onKeyDown={async (e) => {
     <p className="page-subtitle">{pageSubtitles[activePage]}</p>
   </div>
 
+{activePage === 'Home' && (
   <div className="main-header-right">
     <span className="last-updated-text">
       {walletAddress && lastUpdatedAt
         ? `last updated ${formatLastUpdated(lastUpdatedAt)}`
         : walletAddress
-        ? "no data yet"
-        : "enter a wallet to start"}
+        ? 'no data yet'
+        : 'enter a wallet to start'}
     </span>
 
     <button
@@ -2058,11 +2059,12 @@ onKeyDown={async (e) => {
       onClick={() => refreshAll()}
       disabled={isRefreshing || !walletAddress}
     >
-      <span className={isRefreshing ? "spin-refresh" : ""}>
+      <span className={isRefreshing ? 'spin-refresh' : ''}>
         <RefreshIcon />
       </span>
     </button>
   </div>
+)}
 </div>
 
 {activePage === 'Home' && (
@@ -4052,7 +4054,7 @@ const valueUsd =
               </div>
     </div>
     <div style={{ marginTop: 12 }}>
-      <SwapPanel theme={theme} />
+<SwapPanel />
     </div>
   </section>
 )}
